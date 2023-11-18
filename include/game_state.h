@@ -1,7 +1,8 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-#include <vector>
+#include <deque>
+#include <random>
 
 enum GridCell
 {
@@ -23,7 +24,14 @@ struct Pos
 {
     int row;
     int col;
+
+    bool operator==(const Pos &other)
+    {
+        return this->row == other.row && this->col == other.col;
+    }
 };
+
+typedef std::uniform_int_distribution<std::mt19937::result_type> rand_int;
 
 class GameState
 {
@@ -47,11 +55,18 @@ private:
         this->_grid[pos.row * this->n_cols + pos.col] = val;
     }
 
+    Pos &headPos()
+    {
+        return this->_snake.front();
+    }
+
     bool updateHead();
 
-    void updateBody(const Pos &prev_head_pos);
+    void popTail();
 
     bool checkCollision(const Pos &pos) const;
+
+    void newFood();
 
 public:
     const int n_rows;
@@ -60,7 +75,9 @@ public:
 private:
     int *_grid = nullptr;
     int _head_dir = Dir::NONE;
-    std::vector<Pos> _snake;
+    std::deque<Pos> _snake;
+    Pos _food_pos;
     int _interval_start;
     const int _update_interval;
+    std::mt19937 _gen;
 };
