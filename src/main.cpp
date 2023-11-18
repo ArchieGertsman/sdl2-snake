@@ -5,7 +5,7 @@
 
 int main()
 {
-    App app("Snake", 512, 512, 16, 16);
+    App app("Snake", 512, 512, 16, 16, 250);
 
     if (!app.init())
     {
