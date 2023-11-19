@@ -4,7 +4,8 @@
 
 namespace Colors
 {
-    const SDL_Color BLACK = {0, 0, 0, SDL_ALPHA_OPAQUE};
-    const SDL_Color BLUE = {0, 0, 255, SDL_ALPHA_OPAQUE};
-    const SDL_Color RED = {255, 0, 0, SDL_ALPHA_OPAQUE};
+    const SDL_Color BG = {29, 11, 66, SDL_ALPHA_OPAQUE};
+    const SDL_Color FOOD = {199, 32, 110, SDL_ALPHA_OPAQUE};
+    const SDL_Color SNAKE_BODY = {21, 130, 59, SDL_ALPHA_OPAQUE};
+    const SDL_Color SNAKE_HEAD = {27, 171, 77, SDL_ALPHA_OPAQUE};
 }

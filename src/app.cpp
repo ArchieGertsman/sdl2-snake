@@ -66,10 +66,11 @@ void App::run()
 {
     while (true)
     {
-        if (!this->pollEvents() || !this->_game_state.update())
-        {
+        if (!this->pollEvents())
             return;
-        }
+
+        if (!this->_game_state.update())
+            this->_game_state.reset();
 
         this->render();
     }
@@ -100,13 +101,16 @@ void App::renderCell(const Pos &pos)
     switch (cell)
     {
     case GridCell::FOOD:
-        color = Colors::RED;
+        color = Colors::FOOD;
         break;
-    case GridCell::SNAKE:
-        color = Colors::BLUE;
+    case GridCell::SNAKE_HEAD:
+        color = Colors::SNAKE_HEAD;
+        break;
+    case GridCell::SNAKE_BODY:
+        color = Colors::SNAKE_BODY;
         break;
     default:
-        color = Colors::BLACK;
+        color = Colors::BG;
         break;
     }
 
@@ -117,9 +121,7 @@ void App::renderCell(const Pos &pos)
 bool App::pollEvents()
 {
     if (!SDL_PollEvent(&this->_e))
-    {
         return true;
-    }
 
     switch (this->_e.type)
     {

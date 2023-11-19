@@ -1,14 +1,16 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include <vector>
 #include <deque>
 #include <random>
 
-enum GridCell
+enum GridCell : char
 {
     BG,
     FOOD,
-    SNAKE
+    SNAKE_HEAD,
+    SNAKE_BODY
 };
 
 enum Dir
@@ -38,11 +40,11 @@ class GameState
 public:
     GameState(int rows, int cols, int update_interval);
 
-    ~GameState();
-
     bool update();
 
     void handleKeyDown(int code);
+
+    void reset();
 
     int getCell(const Pos &pos) const
     {
@@ -73,7 +75,7 @@ public:
     const int n_cols;
 
 private:
-    int *_grid = nullptr;
+    std::vector<char> _grid;
     int _head_dir = Dir::NONE;
     std::deque<Pos> _snake;
     Pos _food_pos;

@@ -2,24 +2,25 @@
 #include "colors.h"
 
 GameState::GameState(int rows, int cols, int update_interval)
-    : n_rows(rows), n_cols(cols), _update_interval(update_interval),
-      _gen(std::random_device()())
+    : n_rows(rows), n_cols(cols), _grid(rows * cols, 0),
+      _update_interval(update_interval), _gen(std::random_device()())
 {
-    auto num_cells = this->n_rows * this->n_cols;
-    this->_grid = new int[num_cells];
-    memset(this->_grid, 0, num_cells * sizeof(int));
+    this->reset();
+}
 
-    Pos pos{(int)(rows / 2), (int)(cols / 2)};
-    this->_snake.push_front(pos);
+void GameState::reset()
+{
+    std::fill(this->_grid.begin(), this->_grid.end(), 0);
+    this->_snake.clear();
+
+    Pos init_head_pos{(int)(this->n_rows / 2), (int)(this->n_cols / 2)};
+    this->_snake.push_front(init_head_pos);
+    this->setCell(init_head_pos, GridCell::SNAKE_HEAD);
+    this->_head_dir = Dir::NONE;
 
     this->newFood();
 
     this->_interval_start = SDL_GetTicks();
-}
-
-GameState::~GameState()
-{
-    delete this->_grid;
 }
 
 void GameState::handleKeyDown(int code)
@@ -35,6 +36,9 @@ void GameState::handleKeyDown(int code)
         this->_head_dir = dir;
         break;
     }
+    case SDL_SCANCODE_SPACE:
+        this->_head_dir = Dir::NONE;
+        break;
     default:
         break;
     }
@@ -47,6 +51,9 @@ bool GameState::update()
         return true;
 
     this->_interval_start = interval_end;
+
+    if (this->_head_dir == Dir::NONE)
+        return true;
 
     if (!this->updateHead())
         return false;
@@ -62,6 +69,7 @@ bool GameState::update()
 bool GameState::updateHead()
 {
     auto pos = this->_snake.front();
+    auto old_pos = pos;
 
     switch (this->_head_dir)
     {
@@ -82,11 +90,10 @@ bool GameState::updateHead()
     }
 
     if (checkCollision(pos))
-    {
         return false;
-    }
 
-    this->setCell(pos, GridCell::SNAKE);
+    this->setCell(pos, GridCell::SNAKE_HEAD);
+    this->setCell(old_pos, GridCell::SNAKE_BODY);
     this->_snake.push_front(pos);
 
     return true;
@@ -94,7 +101,7 @@ bool GameState::updateHead()
 
 bool GameState::checkCollision(const Pos &pos) const
 {
-    return this->getCell(pos) == GridCell::SNAKE ||
+    return this->getCell(pos) == GridCell::SNAKE_BODY ||
            pos.row == -1 || pos.row == this->n_rows ||
            pos.col == -1 || pos.col == this->n_cols;
 }
@@ -121,6 +128,7 @@ void GameState::newFood()
         {
             this->_grid[j] = GridCell::FOOD;
             this->_food_pos = Pos{(int)(j / this->n_rows), j % this->n_cols};
+            return;
         }
 
         ++bg_count;
