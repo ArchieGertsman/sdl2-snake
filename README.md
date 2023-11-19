@@ -1,3 +1,3 @@
 Snake clone in SDL2 for C++ practice.
 
-![](https://imgur.com/0yDEDvj)
+![](https://i.imgur.com/0yDEDvj.png)
